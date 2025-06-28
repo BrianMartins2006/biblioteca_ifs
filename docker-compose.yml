@@ -1,0 +1,39 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: db_biblioteca
+      POSTGRES_USER: db_admin
+      POSTGRES_PASSWORD: mudar123 # <-- SENHA SIMPLIFICADA TEMPORARIAMENTE
+    ports:
+      - "5432:5432" # Mapeia a porta do Postgres para o host
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U db_admin -d db_biblioteca"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 20s # <-- Aumentado para dar mais tempo para o DB iniciar
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: biblioteca_web.settings.development
+      SECRET_KEY: ${SECRET_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
