@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo_pagina }} - Sistema de Biblioteca{% endblock %}
+
+{% block content %}
+    <h2>{{ titulo_pagina }}</h2>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p>Você está prestes a registrar a devolução do livro: <strong>"{{ emprestimo.livro.titulo }}"</strong> (emprestado para {{ emprestimo.aluno.username }}).</p>
+    <p>Esta ação não pode ser desfeita (exceto pelo admin, se necessário).</p>
+    
+    <form action="{% url 'emprestimos:devolver_emprestimo' emprestimo.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" style="background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer;">Confirmar Devolução</button>
+        <a href="{% url 'emprestimos:listar_emprestimos_ativos' %}" style="background-color: #6c757d; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none; margin-left: 10px;">Cancelar</a>
+    </form>
+{% endblock %}

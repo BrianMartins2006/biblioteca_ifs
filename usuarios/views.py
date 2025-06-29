@@ -2,16 +2,23 @@
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm # Formulário de autenticação padrão do Django
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages # Para exibir mensagens
-from .forms import CustomUserCreationForm 
+from .forms import CustomUserCreationForm # Importe o formulário de registro
 
 def home(request):
-    # Esta será a página inicial.
-    # Pode exibir informações diferentes dependendo se o usuário está logado ou não.
-    return render(request, 'usuarios/home.html')
+    """
+    View para a página inicial do sistema.
+    """
+    context = {
+        'titulo_pagina': 'Página Inicial'
+    }
+    return render(request, 'usuarios/home.html', context)
 
 def login_view(request):
+    """
+    View para o login de usuários.
+    """
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -20,20 +27,33 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                # Redireciona para a página 'home' após o login bem-sucedido
-                return redirect('usuarios:home')
+                messages.success(request, f'Bem-vindo(a), {username}!')
+                return redirect('usuarios:home') # Redireciona para a home após o login
             else:
-                # Mensagem de erro se a autenticação falhar
-                form.add_error(None, "Nome de usuário ou senha inválidos.")
+                messages.error(request, 'Nome de usuário ou senha inválidos.')
+        else:
+            messages.error(request, 'Nome de usuário ou senha inválidos.')
     else:
         form = AuthenticationForm()
-    return render(request, 'usuarios/login.html', {'form': form})
+
+    context = {
+        'form': form,
+        'titulo_pagina': 'Login'
+    }
+    return render(request, 'usuarios/login.html', context)
 
 def logout_view(request):
+    """
+    View para o logout de usuários.
+    """
     logout(request)
-    return redirect('usuarios:home') # Redireciona para a página inicial após o logout
+    messages.info(request, 'Você foi desconectado(a).')
+    return redirect('usuarios:login') # Redireciona para a página de login após o logout
 
 def registro_view(request):
+    """
+    View para o registro de novos usuários (alunos).
+    """
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():

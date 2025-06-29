@@ -3,9 +3,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.db.models import Q # Para consultas complexas
+# from django.utils import timezone # Não é mais necessário aqui, foi movido para emprestimos/views.py
+
 from .models import Livro
 from .forms import LivroForm
-from django.db.models import Q
 
 # Helper para verificar se o usuário é um bibliotecário
 def is_bibliotecario(user):
@@ -13,6 +15,9 @@ def is_bibliotecario(user):
 
 @login_required
 def lista_livros(request):
+    """
+    Lista todos os livros, com opções de busca e filtro.
+    """
     livros = Livro.objects.all()
     query = request.GET.get('q')
     genero_filtro = request.GET.get('genero')
@@ -32,6 +37,7 @@ def lista_livros(request):
     if curso_filtro:
         livros = livros.filter(curso_relacionado__iexact=curso_filtro)
 
+    # Obter gêneros e cursos únicos para os filtros
     generos = Livro.objects.order_by('genero').values_list('genero', flat=True).distinct().exclude(genero__isnull=True).exclude(genero__exact='')
     cursos = Livro.objects.order_by('curso_relacionado').values_list('curso_relacionado', flat=True).distinct().exclude(curso_relacionado__isnull=True).exclude(curso_relacionado__exact='')
 
@@ -42,12 +48,16 @@ def lista_livros(request):
         'curso_filtro': curso_filtro,
         'generos': generos,
         'cursos': cursos,
+        'titulo_pagina': 'Lista de Livros'
     }
     return render(request, 'livros/lista_livros.html', context)
 
 @login_required
 @user_passes_test(is_bibliotecario, login_url='/usuarios/login/')
 def cadastrar_livro(request):
+    """
+    Permite ao bibliotecário cadastrar um novo livro.
+    """
     if request.method == 'POST':
         form = LivroForm(request.POST)
         if form.is_valid():
@@ -68,6 +78,9 @@ def cadastrar_livro(request):
 @login_required
 @user_passes_test(is_bibliotecario, login_url='/usuarios/login/')
 def editar_livro(request, pk):
+    """
+    Permite ao bibliotecário editar um livro existente.
+    """
     livro = get_object_or_404(Livro, pk=pk)
     if request.method == 'POST':
         form = LivroForm(request.POST, instance=livro)
@@ -89,6 +102,9 @@ def editar_livro(request, pk):
 @login_required
 @user_passes_test(is_bibliotecario, login_url='/usuarios/login/')
 def deletar_livro(request, pk):
+    """
+    Permite ao bibliotecário deletar um livro existente.
+    """
     livro = get_object_or_404(Livro, pk=pk)
     if request.method == 'POST':
         livro.delete()
