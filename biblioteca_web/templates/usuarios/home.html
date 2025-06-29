@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Início - Sistema de Biblioteca{% endblock %}
+
+{% block content %}
+    <h2>Bem-vindo ao Sistema de Biblioteca!</h2>
+    {% if user.is_authenticated %}
+        <p>Olá, {{ user.username }}! Você está logado.</p>
+        <p>Aqui você pode navegar pelos livros, gerenciar seus empréstimos e muito mais.</p>
+        <p>Explore as opções no menu acima.</p>
+    {% else %}
+        <p>Por favor, <a href="{% url 'usuarios:login' %}">faça login</a> para acessar todas as funcionalidades do sistema.</p>
+    {% endif %}
+{% endblock %}

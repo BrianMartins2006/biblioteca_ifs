@@ -61,7 +61,7 @@ ROOT_URLCONF = 'biblioteca_web.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'], # Adicione um diretório global de templates
+        'DIRS': [os.path.join(BASE_DIR, 'biblioteca_web', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

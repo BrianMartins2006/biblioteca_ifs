@@ -1,8 +1,9 @@
-# emprestimos/models.py
+# biblioteca_web/emprestimos/models.py
 
 from django.db import models
 from django.conf import settings # Importa o settings para acessar AUTH_USER_MODEL
 from livros.models import Livro # Importa o modelo Livro
+from django.utils import timezone # <--- ADICIONE ESTA LINHA
 
 class Emprestimo(models.Model):
     """
@@ -11,19 +12,18 @@ class Emprestimo(models.Model):
     """
     livro = models.ForeignKey(
         Livro,
-        on_delete=models.PROTECT, # Protege o livro de ser deletado se houver empréstimos
+        on_delete=models.PROTECT,
         related_name='emprestimos',
         verbose_name='Livro'
     )
-    # 'aluno' é uma ForeignKey para o nosso CustomUser
     aluno = models.ForeignKey(
-        settings.AUTH_USER_MODEL, # Usa o modelo de usuário definido em settings.py
-        on_delete=models.PROTECT, # Protege o aluno de ser deletado se houver empréstimos
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
         related_name='emprestimos_realizados',
         verbose_name='Aluno'
     )
     data_emprestimo = models.DateTimeField(
-        auto_now_add=True, # Define a data automaticamente na criação do empréstimo
+        auto_now_add=True,
         verbose_name='Data de Empréstimo'
     )
     data_devolucao_prevista = models.DateTimeField(
@@ -34,11 +34,10 @@ class Emprestimo(models.Model):
         null=True,
         verbose_name='Data de Devolução Real'
     )
-    # Adicionamos um status para o empréstimo, que pode ser 'emprestado', 'devolvido', 'atrasado'
     STATUS_CHOICES = [
         ('emprestado', 'Emprestado'),
         ('devolvido', 'Devolvido'),
-        ('atrasado', 'Atrasado'), # Pode ser calculado dinamicamente ou definido por um bibliotecário
+        ('atrasado', 'Atrasado'),
     ]
     status = models.CharField(
         max_length=20,
@@ -50,13 +49,12 @@ class Emprestimo(models.Model):
     class Meta:
         verbose_name = 'Empréstimo'
         verbose_name_plural = 'Empréstimos'
-        ordering = ['-data_emprestimo'] # Ordena os empréstimos do mais recente para o mais antigo
+        ordering = ['-data_emprestimo']
 
     def __str__(self):
         return f"Empréstimo de '{self.livro.titulo}' para {self.aluno.username}"
 
     def save(self, *args, **kwargs):
-        # Lógica para garantir que o livro seja marcado como indisponível ao ser emprestado
         if self.status == 'emprestado' and self.livro.disponivel:
             self.livro.disponivel = False
             self.livro.save()
@@ -66,9 +64,8 @@ class Emprestimo(models.Model):
         """
         Marca o empréstimo como devolvido e atualiza a disponibilidade do livro.
         """
-        self.data_devolucao_real = models.DateTimeField(auto_now_add=True).auto_now_add
+        self.data_devolucao_real = timezone.now() # <--- CORREÇÃO AQUI
         self.status = 'devolvido'
         self.livro.disponivel = True
         self.livro.save()
-        self.save()
-
+        self.save() # Salva as alterações no próprio objeto Emprestimo

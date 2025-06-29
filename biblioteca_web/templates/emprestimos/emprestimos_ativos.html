@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo_pagina }} - Sistema de Biblioteca{% endblock %}
+
+{% block content %}
+    <h2>{{ titulo_pagina }}</h2>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if emprestimos_ativos %}
+        <table border="1" style="width:100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>Livro</th>
+                    <th>Emprestado Para</th>
+                    <th>Data de Empréstimo</th>
+                    <th>Devolução Prevista</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emprestimo in emprestimos_ativos %}
+                    <tr>
+                        <td>{{ emprestimo.livro.titulo }} ({{ emprestimo.livro.autor }})</td>
+                        <td>{{ emprestimo.aluno.username }}</td>
+                        <td>{{ emprestimo.data_emprestimo|date:"d/m/Y H:i" }}</td>
+                        <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <form action="{% url 'emprestimos:devolver_livro' emprestimo.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" onclick="return confirm('Tem certeza que deseja marcar este livro como devolvido?')" style="background-color: #007bff; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;">Devolver</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Não há empréstimos ativos no momento.</p>
+    {% endif %}
+    <p><a href="{% url 'emprestimos:realizar_emprestimo' %}">Realizar Novo Empréstimo</a></p>
+{% endblock %}

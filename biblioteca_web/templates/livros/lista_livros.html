@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Livros - Sistema de Biblioteca{% endblock %}
+
+{% block content %}
+    <h2>Lista de Livros</h2>
+
+    {# Formulário de Busca e Filtro #}
+    <form method="get" action="{% url 'livros:lista_livros' %}" class="form-filter" style="margin-bottom: 20px; background-color: #eee; padding: 15px; border-radius: 8px;">
+        <div class="form-group">
+            <label for="q">Buscar por Título, Autor, Gênero ou Curso:</label>
+            <input type="text" id="q" name="q" value="{{ query|default_if_none:'' }}" placeholder="Digite aqui...">
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 20px;">
+            <div style="flex: 1;">
+                <label for="genero">Gênero:</label>
+                <select id="genero" name="genero">
+                    <option value="">Todos os Gêneros</option>
+                    {% for genero_opcao in generos %}
+                        <option value="{{ genero_opcao }}" {% if genero_filtro == genero_opcao %}selected{% endif %}>{{ genero_opcao }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label for="curso">Curso Relacionado:</label>
+                <select id="curso" name="curso">
+                    <option value="">Todos os Cursos</option>
+                    {% for curso_opcao in cursos %}
+                        <option value="{{ curso_opcao }}" {% if curso_filtro == curso_opcao %}selected{% endif %}>{{ curso_opcao }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group" style="text-align: right;">
+            <button type="submit" style="background-color: #007bff;">Buscar/Filtrar</button>
+            <a href="{% url 'livros:lista_livros' %}" style="background-color: #6c757d; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none; margin-left: 10px;">Limpar Filtros</a>
+        </div>
+    </form>
+
+    {# Mensagens de feedback (do Django messages framework) #}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {# Botão de Cadastrar Livro (apenas para bibliotecários) #}
+    {% if user.is_bibliotecario %}
+        <p style="margin-bottom: 20px;"><a href="{% url 'livros:cadastrar_livro' %}" style="background-color: #28a745; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none;">+ Cadastrar Novo Livro</a></p>
+    {% endif %}
+
+    {% if livros %}
+        <table border="1" style="width:100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Gênero</th>
+                    <th>Curso Relacionado</th>
+                    <th>Ano</th>
+                    <th>Disponível</th>
+                    {% if user.is_bibliotecario %}<th>Ações</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for livro in livros %}
+                    <tr>
+                        <td>{{ livro.titulo }}</td>
+                        <td>{{ livro.autor }}</td>
+                        <td>{{ livro.genero|default:"N/A" }}</td>
+                        <td>{{ livro.curso_relacionado|default:"N/A" }}</td>
+                        <td>{{ livro.ano_publicacao|default:"N/A" }}</td>
+                        <td>{% if livro.disponivel %}Sim{% else %}Não{% endif %}</td>
+                        {% if user.is_bibliotecario %}
+                            <td>
+                                <a href="{% url 'livros:editar_livro' livro.pk %}" style="background-color: #ffc107; color: black; padding: 5px 10px; border-radius: 4px; text-decoration: none; margin-right: 5px;">Editar</a>
+                                <a href="{% url 'livros:deletar_livro' livro.pk %}" style="background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none;">Excluir</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhum livro encontrado com os critérios de busca/filtro.</p>
+    {% endif %}
+    <br>
+    <p><a href="{% url 'admin:index' %}">Ir para o painel de administração</a> para gerenciar livros.</p>
+{% endblock %}

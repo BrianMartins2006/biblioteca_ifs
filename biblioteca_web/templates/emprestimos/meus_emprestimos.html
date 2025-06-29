@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Meus Empréstimos - Sistema de Biblioteca{% endblock %}
+
+{% block content %}
+    <h2>Meus Empréstimos</h2>
+    <p>{{ mensagem }}</p>
+
+    {% if emprestimos %}
+        <table border="1" style="width:100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>Livro</th>
+                    <th>Data de Empréstimo</th>
+                    <th>Devolução Prevista</th>
+                    <th>Devolução Real</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emprestimo in emprestimos %}
+                    <tr>
+                        <td>{{ emprestimo.livro.titulo }} ({{ emprestimo.livro.autor }})</td>
+                        <td>{{ emprestimo.data_emprestimo|date:"d/m/Y H:i" }}</td>
+                        <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if emprestimo.data_devolucao_real %}
+                                {{ emprestimo.data_devolucao_real|date:"d/m/Y H:i" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ emprestimo.get_status_display }}</td> {# Exibe o texto amigável do status #}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Você não possui nenhum empréstimo no momento.</p>
+    {% endif %}
+    <br>
+    <p>Se você for um bibliotecário, pode adicionar empréstimos pelo <a href="{% url 'admin:index' %}">painel de administração</a>.</p>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Sistema de Biblioteca{% endblock %}
+
+{% block content %}
+    <h2>Login</h2>
+    <form method="post">
+        {% csrf_token %} {# Token de segurança obrigatório no Django para formulários POST #}
+        {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p style="color: red;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        {% if form.non_field_errors %}
+            <div class="messages error">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="form-group">
+            <button type="submit">Entrar</button>
+        </div>
+    </form>
+    <p>Ainda não tem uma conta? <a href="{% url 'usuarios:registro' %}">Registre-se aqui</a>.</p> {# <-- AGORA ESTÁ ATIVADO #}
+{% endblock %}
