@@ -41,6 +41,10 @@
             background-color: #45a049;
         }
     </style>
+    {# ADICIONE A LINHA DO JQUERY AQUI, ANTES DO extra_head #}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    {# BLOCO extra_head DEVE VIR DEPOIS DO JQUERY #}
+    {% block extra_head %}{% endblock %} 
 </head>
 <body>
     <header>
@@ -52,9 +56,9 @@
             <a href="{% url 'livros:lista_livros' %}">Livros</a>
             
             {# O link "Meus Empréstimos" só aparece se o usuário NÃO for bibliotecário #}
-            {% if not user.is_bibliotecario %} {# <-- CORREÇÃO: ADICIONADO ESTE IF #}
+            {% if not user.is_bibliotecario %}
                 <a href="{% url 'emprestimos:meus_emprestimos' %}">Meus Empréstimos</a>
-            {% endif %} {# <-- CORREÇÃO: FECHADO ESTE IF #}
+            {% endif %}
 
             {% if user.is_bibliotecario %}
                 <a href="{% url 'emprestimos:realizar_emprestimo' %}">Emprestar Livro</a>
@@ -84,5 +88,6 @@
     <footer>
         <p>&copy; 2025 Sistema de Biblioteca. Todos os direitos reservados.</p>
     </footer>
+    {% block extra_body %}{% endblock %}
 </body>
 </html>

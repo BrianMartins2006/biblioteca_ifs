@@ -13,5 +13,5 @@ urlpatterns = [
 
     path('usuarios/', include('usuarios.urls')),
     path('livros/', include('livros.urls')), 
-    path('emprestimos/', include('emprestimos.urls')),
+    path('emprestimos/', include('emprestimos.urls', namespace='emprestimos')),
 ]

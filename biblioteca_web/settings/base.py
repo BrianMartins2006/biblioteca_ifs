@@ -1,38 +1,19 @@
-# biblioteca_web/biblioteca_web/settings/base.py
-
 from pathlib import Path
-import os # Importar os para usar variáveis de ambiente
-from dotenv import load_dotenv # Importar load_dotenv do python-dotenv
+import os
+from dotenv import load_dotenv
 
-# Carrega as variáveis de ambiente do arquivo .env
-# Isso deve ser feito no base.py, pois ambos development.py e production.py (futuro)
-# podem precisar de variáveis do .env (ex: SECRET_KEY, embora o banco seja sobrescrito)
+# Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
 
+# Define o diretório base do projeto
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent # Corrigido para apontar para a raiz do projeto
+# Configurações de segurança (sobrescritas em settings/development.py ou production.py)
+SECRET_KEY = os.environ.get('SECRET_KEY') # Obtém a chave do .env
+DEBUG = False
+ALLOWED_HOSTS = []
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-# A SECRET_KEY agora é carregada de uma variável de ambiente (do .env)
-# Ela será definida no development.py (e production.py)
-SECRET_KEY = os.environ.get('SECRET_KEY', 'default-insecure-key-for-fallback') # Adicionado um fallback
-
-
-# SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG será definido em development.py ou production.py
-DEBUG = False # Definido como False por padrão, development.py vai sobrescrever
-
-# ALLOWED_HOSTS será definido em development.py ou production.py
-ALLOWED_HOSTS = [] # Definido como vazio por padrão, development.py vai sobrescrever
-
-
-# Application definition
-
+# Definição das aplicações instaladas
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,10 +21,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Seus novos apps
-    'livros',     # <-- Adicione a vírgula aqui
-    'emprestimos', # <-- Adicione a vírgula aqui
-    'usuarios',    # <-- Adicione a vírgula aqui (boa prática)
+    'dal',          # Django Autocomplete Light para campos de busca
+    'dal_select2',  # Integração do DAL com Select2
+    'livros',       # Aplicação de gerenciamento de livros
+    'emprestimos',  # Aplicação de empréstimos
+    'usuarios',     # Aplicação de usuários
 ]
 
 MIDDLEWARE = [
@@ -76,65 +58,35 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'biblioteca_web.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-# Estas configurações de DATABASE serão sobrescritas no development.py
-# É boa prática deixá-las comentadas ou usar um valor padrão aqui,
-# pois as configurações reais virão do ambiente específico.
+# Configuração de Banco de Dados (sobrescrita em settings/development.py ou production.py)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3', # Deixa o SQLite como fallback, mas será sobrescrito
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
+# Validação de Senhas
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    { 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    { 'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
+    { 'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    { 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
-LANGUAGE_CODE = 'pt-br' # Altere para português do Brasil
-
-TIME_ZONE = 'America/Sao_Paulo' # Altere para o fuso horário de São Paulo (Brasil)
-
+# Internacionalização e Localização
+LANGUAGE_CODE = 'pt-br'
+TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
+# Arquivos Estáticos (CSS, JavaScript, Imagens)
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles' # Adicionado para produção
+STATIC_ROOT = BASE_DIR / 'staticfiles' # Destino para 'collectstatic' em produção
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Adicionando um diretório para mídias (uploads de arquivos, se necessário no futuro)
+# Arquivos de Mídia (Uploads de usuários)
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Modelo de Usuário Customizado
 AUTH_USER_MODEL = 'usuarios.CustomUser'
