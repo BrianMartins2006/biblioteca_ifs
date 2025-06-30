@@ -5,13 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Sistema de Biblioteca{% endblock %}</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
-        header { background-color: #333; color: white; padding: 1em 0; text-align: center; }
-        nav { display: flex; justify-content: center; background-color: #555; padding: 0.5em 0; }
-        nav a { color: white; padding: 0.5em 1em; text-decoration: none; }
-        nav a:hover { background-color: #777; }
-        .container { width: 80%; margin: 20px auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        footer { text-align: center; padding: 1em; background-color: #333; color: white; position: fixed; bottom: 0; width: 100%; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1em 0;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #555;
+            padding: 0.5em 0;
+            flex-wrap: wrap; 
+        }
+        nav a {
+            color: white;
+            padding: 0.5em 1em;
+            text-decoration: none;
+            white-space: nowrap; 
+        }
+        nav a:hover {
+            background-color: #777;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+            padding-bottom: 70px; 
+        }
+        footer {
+            text-align: center;
+            padding: 1em;
+            background-color: #333;
+            color: white;
+            position: fixed; 
+            bottom: 0;
+            width: 100%;
+            z-index: 1000; 
+        }
         .messages { list-style: none; padding: 0; margin: 10px 0; }
         .messages li { padding: 8px 15px; margin-bottom: 5px; border-radius: 5px; }
         .messages .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
@@ -41,9 +85,7 @@
             background-color: #45a049;
         }
     </style>
-    {# ADICIONE A LINHA DO JQUERY AQUI, ANTES DO extra_head #}
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    {# BLOCO extra_head DEVE VIR DEPOIS DO JQUERY #}
     {% block extra_head %}{% endblock %} 
 </head>
 <body>
@@ -73,6 +115,7 @@
         {% endif %}
     </nav>
     <div class="container">
+        {# Mensagens do Django são sempre exibidas no container, mesmo se a página filha não tiver o bloco messages #}
         {% if messages %}
             <ul class="messages">
                 {% for message in messages %}

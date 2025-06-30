@@ -3,28 +3,30 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from django.db.models import Q # Para consultas complexas
-# from django.utils import timezone # Não é mais necessário aqui, foi movido para emprestimos/views.py
+from django.db.models import Q 
+from django.core.paginator import Paginator
 
 from .models import Livro
-from .forms import LivroForm
+from emprestimos.models import Emprestimo 
+from usuarios.models import CustomUser 
+from .forms import LivroForm 
 
-# Helper para verificar se o usuário é um bibliotecário
+
 def is_bibliotecario(user):
-    return user.is_authenticated and user.is_bibliotecario
+    return user.is_authenticated and hasattr(user, 'is_bibliotecario') and user.is_bibliotecario
 
 @login_required
 def lista_livros(request):
     """
-    Lista todos os livros, com opções de busca e filtro.
+    Lista todos os livros, com opções de busca e filtro, e com paginação.
     """
-    livros = Livro.objects.all()
+    livros_list = Livro.objects.all().order_by('titulo') 
     query = request.GET.get('q')
     genero_filtro = request.GET.get('genero')
     curso_filtro = request.GET.get('curso')
 
     if query:
-        livros = livros.filter(
+        livros_list = livros_list.filter(
             Q(titulo__icontains=query) |
             Q(autor__icontains=query) |
             Q(genero__icontains=query) |
@@ -32,22 +34,36 @@ def lista_livros(request):
         )
 
     if genero_filtro:
-        livros = livros.filter(genero__iexact=genero_filtro)
+        livros_list = livros_list.filter(genero__iexact=genero_filtro)
 
     if curso_filtro:
-        livros = livros.filter(curso_relacionado__iexact=curso_filtro)
+        livros_list = livros_list.filter(curso_relacionado__iexact=curso_filtro)
 
-    # Obter gêneros e cursos únicos para os filtros
     generos = Livro.objects.order_by('genero').values_list('genero', flat=True).distinct().exclude(genero__isnull=True).exclude(genero__exact='')
     cursos = Livro.objects.order_by('curso_relacionado').values_list('curso_relacionado', flat=True).distinct().exclude(curso_relacionado__isnull=True).exclude(curso_relacionado__exact='')
 
+    livros_por_pagina = 10  
+    paginator = Paginator(livros_list, livros_por_pagina)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number) 
+    
+    get_params_copy = request.GET.copy()
+    
+    if 'page' in get_params_copy:
+        get_params_copy.pop('page')
+        
+    base_query_string = get_params_copy.urlencode()
+
+
     context = {
-        'livros': livros,
+        'page_obj': page_obj, 
         'query': query,
         'genero_filtro': genero_filtro,
         'curso_filtro': curso_filtro,
         'generos': generos,
         'cursos': cursos,
+        'base_query_string': base_query_string, 
         'titulo_pagina': 'Lista de Livros'
     }
     return render(request, 'livros/lista_livros.html', context)

@@ -1,9 +1,9 @@
 # biblioteca_web/emprestimos/models.py
 
 from django.db import models
-from django.conf import settings # Importa o settings para acessar AUTH_USER_MODEL
-from livros.models import Livro # Importa o modelo Livro
-from django.utils import timezone # <--- ADICIONE ESTA LINHA
+from django.conf import settings 
+from livros.models import Livro 
+from django.utils import timezone 
 
 class Emprestimo(models.Model):
     """
@@ -64,8 +64,8 @@ class Emprestimo(models.Model):
         """
         Marca o empréstimo como devolvido e atualiza a disponibilidade do livro.
         """
-        self.data_devolucao_real = timezone.now() # <--- CORREÇÃO AQUI
+        self.data_devolucao_real = timezone.now() 
         self.status = 'devolvido'
         self.livro.disponivel = True
         self.livro.save()
-        self.save() # Salva as alterações no próprio objeto Emprestimo
+        self.save() 

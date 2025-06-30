@@ -3,41 +3,41 @@
 {% block title %}Meus Empréstimos - Sistema de Biblioteca{% endblock %}
 
 {% block content %}
-    <h2>Meus Empréstimos</h2>
-    <p>{{ mensagem }}</p>
+    <h2 style="text-align: center; color: #333; margin-bottom: 20px;">Meus Empréstimos</h2>
+    <p style="margin-bottom: 15px; color: #555;">{{ mensagem }}</p>
 
     {% if emprestimos %}
-        <table border="1" style="width:100%; border-collapse: collapse;">
+        <table style="width:100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #ddd;">
             <thead>
                 <tr>
-                    <th>Livro</th>
-                    <th>Data de Empréstimo</th>
-                    <th>Devolução Prevista</th>
-                    <th>Devolução Real</th>
-                    <th>Status</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2; font-weight: bold;">Livro</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2; font-weight: bold;">Data de Empréstimo</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2; font-weight: bold;">Devolução Prevista</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2; font-weight: bold;">Devolução Real</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2; font-weight: bold;">Status</th>
                 </tr>
             </thead>
             <tbody>
                 {% for emprestimo in emprestimos %}
-                    <tr>
-                        <td>{{ emprestimo.livro.titulo }} ({{ emprestimo.livro.autor }})</td>
-                        <td>{{ emprestimo.data_emprestimo|date:"d/m/Y H:i" }}</td>
-                        <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y H:i" }}</td>
-                        <td>
+                    {# Correção: Usando o filtro 'divisibleby' para verificar se a linha é par #}
+                    <tr style="{% if forloop.counter|divisibleby:2 %}background-color: #f9f9f9;{% endif %}">
+                        <td style="border: 1px solid #ddd; padding: 8px;">{{ emprestimo.livro.titulo }} ({{ emprestimo.livro.autor }})</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">{{ emprestimo.data_emprestimo|date:"d/m/Y H:i" }}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">{{ emprestimo.data_devolucao_prevista|date:"d/m/Y H:i" }}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">
                             {% if emprestimo.data_devolucao_real %}
                                 {{ emprestimo.data_devolucao_real|date:"d/m/Y H:i" }}
                             {% else %}
                                 -
                             {% endif %}
                         </td>
-                        <td>{{ emprestimo.get_status_display }}</td> {# Exibe o texto amigável do status #}
+                        <td style="border: 1px solid #ddd; padding: 8px;">{{ emprestimo.get_status_display }}</td> {# Exibe o texto amigável do status #}
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% else %}
-        <p>Você não possui nenhum empréstimo no momento.</p>
+        <p style="margin-top: 20px;">Você não possui nenhum empréstimo no momento.</p>
     {% endif %}
     <br>
-    <p>Se você for um bibliotecário, pode adicionar empréstimos pelo <a href="{% url 'admin:index' %}">painel de administração</a>.</p>
 {% endblock %}

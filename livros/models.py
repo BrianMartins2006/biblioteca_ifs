@@ -16,19 +16,16 @@ class Livro(models.Model):
     )
     genero = models.CharField(
         max_length=50,
-        blank=True, # Opcional, se o gênero não for sempre obrigatório
+        blank=True, 
         null=True,
         verbose_name='Gênero'
     )
-    # No diagrama, 'disponivel' é um booleano.
-    # Vamos usar um campo BooleanField com um valor padrão True.
+   
     disponivel = models.BooleanField(
         default=True,
         verbose_name='Disponível para Empréstimo'
     )
-    # O diagrama também menciona 'Consultar Livros por Curso'.
-    # Podemos adicionar um campo de curso aqui, ou criar um modelo 'Curso' separado.
-    # Por enquanto, vamos adicionar como um campo de texto simples para facilitar.
+
     curso_relacionado = models.CharField(
         max_length=100,
         blank=True,
@@ -36,7 +33,7 @@ class Livro(models.Model):
         help_text='Curso ao qual o livro está mais relacionado (ex: Sistemas de Informação, Administração).',
         verbose_name='Curso Relacionado'
     )
-    # Podemos adicionar o ano de publicação para filtros futuros (RF01)
+    
     ano_publicacao = models.IntegerField(
         blank=True,
         null=True,
@@ -46,10 +43,9 @@ class Livro(models.Model):
     class Meta:
         verbose_name = 'Livro'
         verbose_name_plural = 'Livros'
-        ordering = ['titulo'] # Ordena os livros por título por padrão
+        ordering = ['titulo'] 
 
     def __str__(self):
         return f"{self.titulo} - {self.autor}"
 
-    # O método 'emprestar()' do diagrama será implementado na lógica do Empréstimo,
-    # que irá alterar o status 'disponivel' do livro.
+   

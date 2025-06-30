@@ -10,11 +10,10 @@ from usuarios.models import CustomUser
 from .forms import EmprestimoForm
 from dal import autocomplete
 
-# Função auxiliar para verificar se o usuário é bibliotecário
+
 def is_bibliotecario(user):
     return user.is_authenticated and user.is_bibliotecario
 
-# --- NOVAS CLASSES PARA AUTOCOMPLETAR (ADICIONE OU CONFIRME ESTAS CLASSES) ---
 class LivroAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
@@ -23,9 +22,8 @@ class LivroAutocomplete(autocomplete.Select2QuerySetView):
         qs = Livro.objects.all()
 
         if self.q:
-            qs = qs.filter(titulo__icontains=self.q) # Busca por título
+            qs = qs.filter(titulo__icontains=self.q) 
         
-        # Opcional: Você pode querer filtrar apenas livros disponíveis para empréstimo
         qs = qs.filter(disponivel=True)
 
         return qs
@@ -42,11 +40,10 @@ class AlunoAutocomplete(autocomplete.Select2QuerySetView):
                  qs.filter(first_name__icontains=self.q) | \
                  qs.filter(last_name__icontains=self.q)
         
-        # Opcional: Filtra apenas usuários que são "alunos" (não bibliotecários)
         qs = qs.filter(is_bibliotecario=False)
 
         return qs
-# --- FIM DAS NOVAS CLASSES ---
+
 
 
 @login_required

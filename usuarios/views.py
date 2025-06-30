@@ -3,8 +3,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib import messages # Para exibir mensagens
-from .forms import CustomUserCreationForm # Importe o formulário de registro
+from django.contrib import messages 
+from .forms import CustomUserCreationForm 
 
 def home(request):
     """
@@ -28,7 +28,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Bem-vindo(a), {username}!')
-                return redirect('usuarios:home') # Redireciona para a home após o login
+                return redirect('usuarios:home') 
             else:
                 messages.error(request, 'Nome de usuário ou senha inválidos.')
         else:
@@ -48,7 +48,7 @@ def logout_view(request):
     """
     logout(request)
     messages.info(request, 'Você foi desconectado(a).')
-    return redirect('usuarios:login') # Redireciona para a página de login após o logout
+    return redirect('usuarios:login') 
 
 def registro_view(request):
     """
@@ -59,11 +59,11 @@ def registro_view(request):
         if form.is_valid():
             user = form.save()
             messages.success(request, 'Sua conta foi criada com sucesso! Por favor, faça login.')
-            return redirect('usuarios:login') # Redireciona para a página de login
+            return redirect('usuarios:login') 
         else:
             messages.error(request, 'Houve um erro no registro. Por favor, corrija os erros abaixo.')
     else:
-        form = CustomUserCreationForm() # Formulário vazio para GET
+        form = CustomUserCreationForm() 
 
     context = {
         'form': form,
