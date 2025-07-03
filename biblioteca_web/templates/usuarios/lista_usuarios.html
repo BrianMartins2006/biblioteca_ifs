@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo_pagina }} - Sistema de Biblioteca{% endblock %}
+
+{% block content %}
+    <h2>{{ titulo_pagina }}</h2>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p style="margin-bottom: 20px;">
+        <a href="{% url 'usuarios:cadastrar_novo_usuario' %}" style="background-color: #28a745; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none;">+ Cadastrar Novo Usuário</a>
+    </p>
+
+    {% if usuarios %}
+        <table border="1" style="width:100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Nome Completo</th>
+                    <th>Matrícula/Identificação</th>
+                    <th>Email</th>
+                    <th>Tipo de Usuário</th>
+                    <th>Ativo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.username }}</td>
+                        <td>{{ usuario.first_name }} {{ usuario.last_name }}</td> {# Adapte para 'nome_completo' se seu modelo usa #}
+                        <td>{{ usuario.matricula|default:"N/A" }}</td> {# Adapte para 'matricula_ou_identificacao' se seu modelo usa #}
+                        <td>{{ usuario.email|default:"N/A" }}</td>
+                        <td>{% if usuario.is_bibliotecario %}Bibliotecário{% else %}Aluno{% endif %}</td>
+                        <td>{% if usuario.is_active %}Sim{% else %}Não{% endif %}</td>
+                        <td>
+                            <a href="{% url 'usuarios:editar_usuario' usuario.pk %}" style="background-color: #ffc107; color: black; padding: 5px 10px; border-radius: 4px; text-decoration: none; margin-right: 5px;">Editar</a>
+                            {% if request.user.pk != usuario.pk %} {# Previne auto-exclusão #}
+                                <a href="{% url 'usuarios:deletar_usuario' usuario.pk %}" style="background-color: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none;">Excluir</a>
+                            {% else %}
+                                <span style="color: #6c757d; padding: 5px 10px;">(Você)</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhum usuário encontrado.</p>
+    {% endif %}
+{% endblock %}

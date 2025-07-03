@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo_pagina }} - Sistema de Biblioteca{% endblock %}
+
+{% block content %}
+    <h2>{{ titulo_pagina }}</h2>
+
+    <p>Tem certeza que deseja excluir o usuário: "<strong>{{ usuario.username }}</strong>" ({{ usuario.first_name }} {{ usuario.last_name }})?</p> {# Adapte os campos de nome aqui também #}
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" style="background-color: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer;">Confirmar Exclusão</button>
+        <a href="{% url 'usuarios:lista_usuarios' %}" style="background-color: #6c757d; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none; margin-left: 10px;">Cancelar</a>
+    </form>
+{% endblock %}
